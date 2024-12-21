@@ -27,15 +27,4 @@ that highly sensitive to heat emmision. It's is measured in *W/m²·sr·μm*.
 
 [Analysis Results]
 
-The rest of paper's analysis can be found [here]()
-
-## References
-
-### Assignment's
-
-- https://www.researchgate.net/publication/260010654_The_New_VIIRS_375_m_active_fire_detection_data_product_Algorithm_description_and_initial_assessment
-
-### Other
-
-- https://www.researchgate.net/publication/307583646_Hot_Pixel_Identification_using_Satellite_Hyper-spectral_Data
-- https://www.sciencedirect.com/science/article/abs/pii/S0378377421000287
+The rest of paper's analysis can be found [here](./new-viirs-375-fire-detection.md).

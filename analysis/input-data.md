@@ -27,7 +27,7 @@ As a VNP02 file, this file contains the **radiance recorded by the sensor**.
 2. Observation data (M07, M08, ...)
 3. Scan line attributes (Start time, End time, Mid time, ...)
 
-#### Understanding the M13 band
+#### Observation Data: Understanding the M13 band
 
 ##### M13 Plot: Color contour X: number of line, Y: number of pixels
 
@@ -47,5 +47,55 @@ As a VNP03 file, this file contains the **geographical coordinates of each pixel
 2. Navigation data (Attitude quaternions at EV mid-times (J2000 to spacecraft), Attitude angles (roll, pitch, yaw) at EV start-times, ...)
 3. Scan line attributes (Start time, End time, Mid time, HAM side, ...)
 
+#### Geolocation data: Understanding the data
 
+![longitude_plot_1](../longitude_in_VNP03MOD_NRT.A2020233.1000.001.png)
+![latitude_plot_1](../latitude_in_VNP03MOD_NRT.A2020233.1000.001.png)
+![height_plot_1](../height_in_VNP03MOD_NRT.A2020233.1000.001.png)
 
+## Questions
+
+### Pixel location / correlation with data
+
+We have data based on pixel location, including:
+
+- Brightness
+- Longitude
+- Latitute
+- Height
+- ... and more based NetCDF file and filter applied
+
+In both NetCDF files, data of interest like the forementioned, have two
+variables that are exactly the same on all cases, that being:
+
+1. number_of_lines = 3232  
+2. number_of_pixels = 3200
+
+So, you can create the plots and have this uniform cartesian space:
+
+```
+Number of scan lines
+     ^
+3221 |
+     |
+     |
+     |
+     |
+     |
+   0 |- - - - - - - - - - > Pixels
+      0                 3199
+```
+
+#### Interpretations
+
+##### About Grid and the Map plotting in Panoply
+
+The dimensions of the latitude and longitude variables (3232 lines and 3200 pixels) correspond to the spatial grid of the data. Each point in the grid has a pair of latitude and longitude values, defining its geographic location.
+
+So what Panoply essentially does, is:
+
+1. Recognize which variables represent latitude and longitude.
+2. Map the grid dimensions (number_of_lines and number_of_pixels) to the map.
+3. Choose appropriate map projections and overlay options.
+
+In simple words, the number of lines (rows) and number of pixels (columns) in the data define a Cartesian grid in the file, and the latitude and longitude arrays are used to geolocate this grid onto a map.
