@@ -1,18 +1,19 @@
 from typing import Annotated
 from constants import homepage
 from fastapi.responses import HTMLResponse
-from lib import validate_netcdf_files, debug_import_data
+from lib import debug_import_data
 from fastapi import FastAPI, File, UploadFile, HTTPException
 
 app = FastAPI()
 
-@app.post("/uploadfiles/")
-async def create_upload_files(
+@app.post("/detect_thermal_anomalies/")
+async def debug_input_files(
     files: Annotated[
         list[UploadFile], File(description="Multiple files as UploadFile")
     ],
 ):
-    return debug_import_data(files)
+    results = await debug_import_data(files)
+    return results
 
 @app.get("/")
 async def main():

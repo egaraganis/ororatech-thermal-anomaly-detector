@@ -40,7 +40,7 @@ homepage = """
 <body>
     <div>
         <img src="https://ororatech.com/wp-content/uploads/2021/12/orora_logo.svg" alt="Orota Tech Logo">
-        <form action="/uploadfiles/" enctype="multipart/form-data" method="post">
+        <form action="/detect_thermal_anomalies/" enctype="multipart/form-data" method="post">
             <input name="files" type="file" accept="application/x-netcdf" multiple id="fileInput">
             <input type="submit" value="Upload Satellite Overpass Files">
         </form>
