@@ -9,10 +9,10 @@ Each overpass consists of two NetCDF files, that can be explored using [Panoply]
 
 We have **4** such overpasses (8 files):
 
-- 1000
-- 2118
-- 0942
-- 2100
+- 1000: 20/08/2020 10:00 - 10:06
+- 2118: 20/08/2020 21:18 - 21:24
+- 0942: 21/08/2020 9:42 - 9:48
+- 2100: 21/08/2020 21:00 - 21:06
 
 ## Understanding input format
 
@@ -28,6 +28,8 @@ As a VNP02 file, this file contains the **radiance recorded by the sensor**.
 3. Scan line attributes (Start time, End time, Mid time, ...)
 
 #### Observation Data: Understanding the M13 band
+
+The M13_Quality_Flags indicate specific issues or conditions affecting the data (e.g. clouds, saturation, calibration errors), while the M13_Uncertainty_Index provides a numerical measure of confidence in the accuracy or reliability of the radiometric data.
 
 ##### M13 Plot: Color contour X: number of line, Y: number of pixels
 
@@ -79,9 +81,9 @@ Number of scan lines
 3221 |
      |
      |
+     |  X: Captured metric
      |
-     |
-     |
+     |  
    0 |- - - - - - - - - - > Pixels
       0                 3199
 ```

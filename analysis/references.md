@@ -14,3 +14,4 @@ Resource:
 
 8. https://www.researchgate.net/publication/307583646_Hot_Pixel_Identification_using_Satellite_Hyper-spectral_Data
 9. https://www.sciencedirect.com/science/article/abs/pii/S0378377421000287
+10. https://lpdaac.usgs.gov/data/get-started-data/collection-overview/missions/s-npp-nasa-viirs-overview/

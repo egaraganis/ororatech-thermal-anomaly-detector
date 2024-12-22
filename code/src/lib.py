@@ -3,6 +3,8 @@ import netCDF4
 import io
 import tempfile
 import os
+import numpy as np
+import matplotlib.pyplot as plt
 
 def validate_uploaded_netcdf_files(files: list[UploadFile]):
     if len(files) != 2:
@@ -49,6 +51,31 @@ async def read_netcdf_as_dataset(file):
         finally:
             tmp.close()
 
+def analyze_observation_data(observation_nc):
+    print("\n\n\n")
+
+    M13 = observation_nc.groups["observation_data"].variables["M13"]
+    #print(M13)
+
+    data = M13[:]
+    #print(data)
+
+    min_value = data.min()
+    max_value = data.max()
+
+    min_position = np.unravel_index(data.argmin(), M13.shape)
+    max_position = np.unravel_index(data.argmax(), M13.shape)
+
+    print(f"Minimum value: {min_value} at scan line {min_position[0]}, pixel {min_position[1]}")
+    print(f"Maximum value: {max_value} at scan line {max_position[0]}, pixel {max_position[1]}")
+
+    plt.figure(figsize=(10, 6))
+    plt.contourf(data, levels=100, cmap='viridis')
+    plt.colorbar(label='Radiance (Watts/m^2/sr/μm)')
+    plt.title(f'Color Contour Plot of M13')
+    plt.xlabel('Pixel')
+    plt.ylabel('Scan Line')
+    plt.show()
 
 async def debug_import_data(files: list[UploadFile]):
     validated_netcdf_files = validate_uploaded_netcdf_files(files)
@@ -58,9 +85,13 @@ async def debug_import_data(files: list[UploadFile]):
 
     print("---- Observation Data - NetCDF file ----")
     print(observation_nc)
+
     print("\n\n\n")
+    
     print("---- Geolocation Data - NetCDF file ----")
     print(geolocation_nc)
+
+    analyze_observation_data(observation_nc)
 
     os.remove(o_tmp_file_name)
     os.remove(g_tmp_file_name)
