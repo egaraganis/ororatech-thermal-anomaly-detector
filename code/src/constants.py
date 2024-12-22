@@ -1,3 +1,12 @@
+h = 6.626e-34  # Planck's constant, J·s
+c = 3e8        # Speed of light, m/s
+k = 1.381e-23  # Boltzmann constant, J/K
+lambda_m = 4.05e-6  # Wavelength for M13, in meters (4.05 µm)
+lamnda_m_5 = lambda_m**5 
+plancks_numerator = h * c
+plancks_denominator = lambda_m * k
+plancks_exponent_part_numerator = (2 * h * c**2)
+
 homepage = """
 <!DOCTYPE html>
 <html lang="en">

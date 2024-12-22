@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 import geojson
 from shapely.geometry import Polygon
 from sklearn.cluster import DBSCAN
+import math
+from constants import plancks_exponent_part_numerator, lamnda_m_5, plancks_numerator, plancks_denominator
 
 def debug_hotpixes_candidates(hotpixel_candidates):
     for pos in hotpixel_candidates:
@@ -94,6 +96,36 @@ def find_mix_max_and_contour_plot(observation_nc):
     plt.title(f'Color Contour Plot of M13')
     plt.xlabel('Pixel')
     plt.ylabel('Scan Line')
+    plt.show()
+
+def calculate_celcius_with_plancks_equation(radiance):
+
+    exponent_part = plancks_exponent_part_numerator / (radiance*10**6 * lamnda_m_5)
+    T_kelvin = plancks_numerator / (plancks_denominator * math.log(1 + exponent_part))
+
+    T_celsius = T_kelvin - 273.15
+    return T_celsius
+
+def apply_plancks_equation_to_observation_data_and_color_contour(observation_nc):
+    M13 = observation_nc.groups["observation_data"].variables["M13"]
+    data = M13[:]
+
+    calculated_celcius_per_pixel = []
+
+    for pixel_radiance in data.flatten():
+        calculated_celcius_per_pixel.append(calculate_celcius_with_plancks_equation(pixel_radiance))
+
+    calculated_celcius_data = np.array(calculated_celcius_per_pixel).reshape(data.shape)
+
+    plt.figure(figsize=(8, 6))
+    
+    contour = plt.contourf(calculated_celcius_data, cmap='coolwarm', levels=20)  # You can adjust the number of levels
+    plt.colorbar(contour)
+    
+    plt.title("Temperature Distribution (°C)")
+    plt.xlabel("Pixel (X)")
+    plt.ylabel("Scanline (Y)")
+    
     plt.show()
 
 def apply_25_percent_threshold_and_return_geojson_points(observation_nc, geolocation_nc):
@@ -206,8 +238,10 @@ async def detect_thermal_anomalies(files: list[UploadFile]):
     geolocation_nc, g_tmp_file_name = await read_netcdf_as_dataset(validated_netcdf_files['geolocation_data'])
 
     #find_mix_max_and_contour_plot(observation_nc)
-    geojson_points = apply_25_percent_threshold_and_return_geojson_points(observation_nc, geolocation_nc)
-    geojson_convex = apply_25_percent_threshold_and_return_geojson_convex(observation_nc, geolocation_nc)
+    #geojson_points = apply_25_percent_threshold_and_return_geojson_points(observation_nc, geolocation_nc)
+    #geojson_convex = apply_25_percent_threshold_and_return_geojson_convex(observation_nc, geolocation_nc)
+
+    apply_plancks_equation_to_observation_data_and_color_contour(observation_nc)
 
     os.remove(o_tmp_file_name)
     os.remove(g_tmp_file_name)
@@ -215,9 +249,11 @@ async def detect_thermal_anomalies(files: list[UploadFile]):
     observation_nc.close()
     geolocation_nc.close()
 
-    geojson = {
-        "points": geojson_points,
-        "convex": geojson_convex
-    }
+    # geojson = {
+    #     "points": geojson_points,
+    #     "convex": geojson_convex
+    # }
+
+    geojson = ""
 
     return JSONResponse(content=geojson, media_type="application/geo+json")
