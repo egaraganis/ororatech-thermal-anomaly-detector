@@ -38,40 +38,40 @@ In order to understand the data, I'll identify the MIN-MAX value of each overpas
 Min value: 0.0010805600322782993 at scan line 2761, pixel 3173  
 Max value: 81.32862854003906 at scan line 1035, pixel 1514
 
-![M13 Color Contour - 1](../img/p-color-contour-1000-m13-0.png)
-![M13 Color Contour - 2](../img/p-color-contour-1000-m13-1.png)
-![M13 Color Contour - 3](../img/p-color-contour-1000-m13-2.png)
-![M13 Color Contour - 3](../img/p-color-contour-1000-m13-3.png)
+![1000 M13 Color Contour - 1](../img/p-color-contour-1000-m13-0.png)
+![1000 M13 Color Contour - 2](../img/p-color-contour-1000-m13-1.png)
+![1000 M13 Color Contour - 3](../img/p-color-contour-1000-m13-2.png)
+![1000 M13 Color Contour - 3](../img/p-color-contour-1000-m13-3.png)
 
 ### 2118
 
 Min value: 0.009168829768896103 at scan line 1847, pixel 153  
 Max value: 264.317626953125 at scan line 2925, pixel 1116
 
-![M13 Color Contour - 1](../img/p-color-contour-2118-m13-0.png)
-![M13 Color Contour - 2](../img/p-color-contour-2118-m13-1.png)
-![M13 Color Contour - 3](../img/p-color-contour-2118-m13-2.png)
-![M13 Color Contour - 3](../img/p-color-contour-2118-m13-3.png)
+![2118 M13 Color Contour - 1](../img/p-color-contour-2118-m13-0.png)
+![2118 M13 Color Contour - 2](../img/p-color-contour-2118-m13-1.png)
+![2118 M13 Color Contour - 3](../img/p-color-contour-2118-m13-2.png)
+![2118 M13 Color Contour - 4](../img/p-color-contour-2118-m13-3.png)
 
 ### 0942
 
 Min value: 0.0010805600322782993 at scan line 1510, pixel 2420  
 Max value: 16.404090881347656 at scan line 1075, pixel 1237
 
-![M13 Color Contour - 1](../img/p-color-contour-0942-m13-0.png)
-![M13 Color Contour - 2](../img/p-color-contour-0942-m13-1.png)
-![M13 Color Contour - 3](../img/p-color-contour-0942-m13-2.png)
-![M13 Color Contour - 3](../img/p-color-contour-0942-m13-3.png)
+![0942 M13 Color Contour - 1](../img/p-color-contour-0942-m13-0.png)
+![0942 M13 Color Contour - 2](../img/p-color-contour-0942-m13-1.png)
+![0942 M13 Color Contour - 3](../img/p-color-contour-0942-m13-2.png)
+![0942 M13 Color Contour - 4](../img/p-color-contour-0942-m13-3.png)
 
 ### 2100
 
 Min value: 0.017257098108530045 at scan line 72, pixel 179  
 Max value: 145.32301330566406 at scan line 2869, pixel 1418
 
-![M13 Color Contour - 1](../img/p-color-contour-2100-m13-0.png)
-![M13 Color Contour - 2](../img/p-color-contour-2100-m13-1.png)
-![M13 Color Contour - 3](../img/p-color-contour-2100-m13-2.png)
-![M13 Color Contour - 3](../img/p-color-contour-2100-m13-3.png)
+![2100 M13 Color Contour - 1](../img/p-color-contour-2100-m13-0.png)
+![2100 M13 Color Contour - 2](../img/p-color-contour-2100-m13-1.png)
+![2100 M13 Color Contour - 3](../img/p-color-contour-2100-m13-2.png)
+![2100 M13 Color Contour - 4](../img/p-color-contour-2100-m13-3.png)
 
 ### Initial observation
 
@@ -83,7 +83,7 @@ Min value: 0.0010805600322782993 at scan line 2761, pixel 3173
 Max value: 81.32862854003906 at scan line 1035, pixel 1514
 
 ![1000 array](../img/1000-array.png)
-![M13 Color Contour - 3](../img/p-color-contour-1000-m13-3.png)
+![1000 M13 Color Contour - 3](../img/p-color-contour-1000-m13-3.png)
 
 Given the max value of 81.32, there's a visible surrounding increased radiance, at around 20-25.
 
@@ -97,8 +97,8 @@ That might be an indicator of first threshold.
 Min value: 0.009168829768896103 at scan line 1847, pixel 153  
 Max value: 264.317626953125 at scan line 2925, pixel 1116
 
-![1000 array](../img/2118-array.png)
-![M13 Color Contour - 3](../img/p-color-contour-2118-m13-3.png)
+![2118 array](../img/2118-array.png)
+![2118 Color Contour - 4](../img/p-color-contour-2118-m13-3.png)
 
 Given the above estimates, the 25% of max value is around 65, which also is visible with plain eye and indicates a fire-background.
 
@@ -107,8 +107,8 @@ Given the above estimates, the 25% of max value is around 65, which also is visi
 Min value: 0.0010805600322782993 at scan line 1510, pixel 2420  
 Max value: 16.404090881347656 at scan line 1075, pixel 1237
 
-![M13 Color Contour - 3](../img/0942-array.png)
-![M13 Color Contour - 3](../img/p-color-contour-0942-m13-3.png)
+![0942 array](../img/0942-array.png)
+![0942 M13 Color Contour - 4](../img/p-color-contour-0942-m13-3.png)
 
 In similar manner, the 25% of max value is around 4, which agains indicates the visible spectrum of the potential fire.
 
@@ -117,8 +117,8 @@ In similar manner, the 25% of max value is around 4, which agains indicates the 
 Min value: 0.017257098108530045 at scan line 72, pixel 179  
 Max value: 145.32301330566406 at scan line 2869, pixel 1418
 
-![M13 Color Contour - 3](../img/2100-array.png)
-![M13 Color Contour - 3](../img/p-color-contour-2100-m13-3.png)
+![2100 array](../img/2100-array.png)
+![2100 M13 Color Contour - 4](../img/p-color-contour-2100-m13-3.png)
 
 For one last time, the 25% of max value is 36.25.
 
@@ -127,3 +127,183 @@ That gives a first initial rough threshold at around the 25% of the max value. T
 Details about the 25-percent threshold will be further elaborated [here](./25-percent-threshold.md).
 
 ## Geographical interpretation and correlation
+
+### Geolocating hotpixels
+
+Since we have a first rough threshold, we can filter out the hotpixels candidates
+
+```python
+def apply_25_percent_threshold_and_return_geojson_points(observation_nc, geolocation_nc):
+    M13 = observation_nc.groups["observation_data"].variables["M13"]
+    data = M13[:]
+
+    max_value = data.max()
+    threshold = max_value * 0.25
+
+    hotpixel_candidates = np.argwhere(data > threshold)
+
+    return hotpixel_candidates_to_geojson_points(data, geolocation_nc, hotpixel_candidates)
+```
+
+We can now correlate our observation data with our geolocation data in the following way
+
+```python
+def hotpixel_candidates_to_geospatial_coords(geolocation_nc, hotpixel_candidates):
+    lats = geolocation_nc.groups["geolocation_data"].variables["latitude"][:]
+    longs = geolocation_nc.groups["geolocation_data"].variables["longitude"][:]
+
+    hotpixel_candidates_as_geospatial_coords = []
+    for pos in hotpixel_candidates:
+        scan_line, pixel = pos
+        longitude = longs[scan_line, pixel]
+        latitude = lats[scan_line, pixel]
+
+        geospatial_coords = (float(longitude), float(latitude))
+        hotpixel_candidates_as_geospatial_coords.append(geospatial_coords)
+    
+    return hotpixel_candidates_as_geospatial_coords
+```
+
+and we can locate our hotpixel candidats across the globe.
+
+#### 1000
+
+![M13 Color Contour - 3](../img/p-color-contour-1000-m13-2.png)
+![1000 GeoPoints](../img/1000-geopoints.png)
+
+#### 2118
+
+![2118 M13 Color Contour - 3](../img/p-color-contour-2118-m13-2.png)
+![1000 GeoPoints](../img/2118-geopoints.png)
+
+#### 0942
+
+![2118 M13 Color Contour - 3](../img/p-color-contour-0942-m13-1.png)
+![0942 GeoPoints](../img/0942-geopoints.png)
+
+#### 2100
+
+![2100 M13 Color Contour - 3](../img/p-color-contour-2100-m13-1.png)
+![2100 GeoPoints](../img/2100-geopoints.png)
+
+### Clustring, Convex and Concave
+
+Since we have the list of geopoints, we can create clusters group fires together. I'll
+proceed with DBSCAN (Density-Based Spatial Clustering of Applications with Noise) algorithm to cluster geospatial coordinates based on their density. I could also use K-means, but I'll start with a density-based candidate.
+
+```python
+def cluster_hotpixel_candidates_based_on_geospatial_coords_and_return_geojson_convex_for_each(hotpixel_candidates_with_geospatial_coords):
+    db = DBSCAN(eps=1, min_samples=3)
+    labels = db.fit_predict(hotpixel_candidates_with_geospatial_coords)
+    
+    #print("Cluster labels for each point:", labels)
+    
+    cluster_points_dict = {}
+
+    for label, point in zip(labels, hotpixel_candidates_with_geospatial_coords):
+        if label not in cluster_points_dict:
+            cluster_points_dict[label] = []
+        cluster_points_dict[label].append(point)
+
+    geojson_data = {
+        "type": "FeatureCollection",
+        "features": []
+    }
+
+    for cluster_id, cluster_points in cluster_points_dict.items():
+        print(f"Cluster {cluster_id}:")
+        print(np.array(cluster_points))
+        print()
+
+    features = []
+    
+    for cluster_id, points in cluster_points_dict.items():
+        if cluster_id == -1:
+            points_as_geojson = [geojson.Point(point) for point in points]
+            features.extend([geojson.Feature(geometry=point, properties={"cluster": str(cluster_id)}) for point in points_as_geojson])
+        else:
+            polygon = Polygon(points)
+            feature = geojson.Feature(geometry=polygon, properties={"cluster": str(cluster_id)})
+            features.append(feature)
+
+    feature_collection = geojson.FeatureCollection(features)
+
+    return feature_collection
+```
+
+This will get us the following clusters:
+
+```
+Cluster 0:
+[[-110.7358017    33.59133911]
+ [-110.73579407   33.60146332]
+ [-110.73025513   33.59639359]
+ [-110.74247742   33.59550476]]
+
+Cluster -1:
+[[-118.62554932   34.64097595]
+ [-118.6272583    34.64771652]
+ [-118.44802094   36.16013336]
+ [-121.5568924    36.08182144]
+ [-122.31288147   38.58563232]
+ [-122.42124939   38.69715118]
+ [-114.42114258   40.05718994]
+ [-114.43203735   40.0562439 ]]
+
+Cluster 1:
+[[-121.40475464   37.19813538]
+ [-121.41491699   37.20340347]
+ [-121.44151306   37.24637222]
+ [-121.45319366   37.25822449]
+ [-121.5871048    37.41403961]
+ [-121.59572601   37.41272354]
+ [-121.54870605   37.44037247]
+ [-121.55734253   37.4390564 ]]
+
+Cluster 2:
+[[-120.86023712   39.86500168]
+ [-120.86956787   39.86369324]
+ [-120.87889862   39.90847397]
+ [-120.7756958    40.26120758]
+ [-120.7775116    40.26786041]
+ [-120.78694916   40.2665596 ]
+ [-120.68502808   40.3219986 ]
+ [-120.6399765    40.34206009]
+ [-120.64944458   40.34075546]
+ [-120.64135742   40.34879303]
+ [-120.74514771   40.33445358]
+ [-120.7543869    40.33317184]
+ [-120.74643707   40.34119034]
+ [-120.18227386   41.01687622]
+ [-120.19193268   41.01562119]
+ [-120.18370819   41.02371216]]
+
+Cluster 3:
+[[-122.82202911   39.76302719]
+ [-122.76828003   39.80564117]
+ [-122.77716827   39.804245  ]
+ [-122.83301544   39.91775131]]
+```
+
+For the following points for example in the 2100 case
+
+![2100 GeoPoints](../img/2100-geopoints.png)
+
+We will get the following rough clusters polygons:
+
+![2100 Polygons](../img/2100-polygons.png)
+
+    I experimented with various convex and concave hull algorithms but I haven't generated successful convex or concaves yet
+
+
+## Touchdown, recap and further steps
+
+Have research and successfuly completed a first implementation circle, I can recap the process in the following steps:
+
+1. Derive the apply the initial 25% threshold
+2. Apply threshold to M13 filter and find hotspot candidates
+3. Convert those hotspot candidates from scan and pixel to geospatial coordinates
+4. Cluster those hotspot candidates
+5. Create a convex or/and concave to get the geojson polygons
+
+Further steps include experimenting with each one of the above steps, like applying other thresholds, clustering with different candidates, effectively creating convex or concave for each cluster.

@@ -7,6 +7,8 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import geojson
+from shapely.geometry import Polygon
+from sklearn.cluster import DBSCAN
 
 def debug_hotpixes_candidates(hotpixel_candidates):
     for pos in hotpixel_candidates:
@@ -102,7 +104,76 @@ def apply_25_percent_threshold_and_return_geojson_points(observation_nc, geoloca
     threshold = max_value * 0.25
 
     hotpixel_candidates = np.argwhere(data > threshold)
+
     return hotpixel_candidates_to_geojson_points(data, geolocation_nc, hotpixel_candidates)
+
+def apply_25_percent_threshold_and_return_geojson_convex(observation_nc, geolocation_nc):
+    M13 = observation_nc.groups["observation_data"].variables["M13"]
+    data = M13[:]
+
+    max_value = data.max()
+    threshold = max_value * 0.25
+
+    hotpixel_candidates = np.argwhere(data > threshold)
+
+    hotpixel_candidates_with_geospatial_coords = hotpixel_candidates_to_geospatial_coords(geolocation_nc, hotpixel_candidates)
+
+    geojson = cluster_hotpixel_candidates_based_on_geospatial_coords_and_return_geojson_convex_for_each(hotpixel_candidates_with_geospatial_coords)
+
+    return geojson
+
+def cluster_hotpixel_candidates_based_on_geospatial_coords_and_return_geojson_convex_for_each(hotpixel_candidates_with_geospatial_coords):
+    db = DBSCAN(eps=1, min_samples=3)
+    labels = db.fit_predict(hotpixel_candidates_with_geospatial_coords)
+    
+    #print("Cluster labels for each point:", labels)
+    
+    cluster_points_dict = {}
+
+    for label, point in zip(labels, hotpixel_candidates_with_geospatial_coords):
+        if label not in cluster_points_dict:
+            cluster_points_dict[label] = []
+        cluster_points_dict[label].append(point)
+
+    geojson_data = {
+        "type": "FeatureCollection",
+        "features": []
+    }
+
+    for cluster_id, cluster_points in cluster_points_dict.items():
+        print(f"Cluster {cluster_id}:")
+        print(np.array(cluster_points))
+        print()
+
+    features = []
+    
+    for cluster_id, points in cluster_points_dict.items():
+        if cluster_id == -1:
+            points_as_geojson = [geojson.Point(point) for point in points]
+            features.extend([geojson.Feature(geometry=point, properties={"cluster": str(cluster_id)}) for point in points_as_geojson])
+        else:
+            polygon = Polygon(points)
+            feature = geojson.Feature(geometry=polygon, properties={"cluster": str(cluster_id)})
+            features.append(feature)
+
+    feature_collection = geojson.FeatureCollection(features)
+
+    return feature_collection
+
+def hotpixel_candidates_to_geospatial_coords(geolocation_nc, hotpixel_candidates):
+    lats = geolocation_nc.groups["geolocation_data"].variables["latitude"][:]
+    longs = geolocation_nc.groups["geolocation_data"].variables["longitude"][:]
+
+    hotpixel_candidates_as_geospatial_coords = []
+    for pos in hotpixel_candidates:
+        scan_line, pixel = pos
+        longitude = longs[scan_line, pixel]
+        latitude = lats[scan_line, pixel]
+
+        geospatial_coords = (float(longitude), float(latitude))
+        hotpixel_candidates_as_geospatial_coords.append(geospatial_coords)
+    
+    return hotpixel_candidates_as_geospatial_coords
 
 def hotpixel_candidates_to_geojson_points(observation_data, geolocation_nc, hotpixel_candidates):
     lats = geolocation_nc.groups["geolocation_data"].variables["latitude"][:]
@@ -135,7 +206,8 @@ async def detect_thermal_anomalies(files: list[UploadFile]):
     geolocation_nc, g_tmp_file_name = await read_netcdf_as_dataset(validated_netcdf_files['geolocation_data'])
 
     #find_mix_max_and_contour_plot(observation_nc)
-    geojson_string = apply_25_percent_threshold_and_return_geojson_points(observation_nc, geolocation_nc)
+    geojson_points = apply_25_percent_threshold_and_return_geojson_points(observation_nc, geolocation_nc)
+    geojson_convex = apply_25_percent_threshold_and_return_geojson_convex(observation_nc, geolocation_nc)
 
     os.remove(o_tmp_file_name)
     os.remove(g_tmp_file_name)
@@ -143,4 +215,9 @@ async def detect_thermal_anomalies(files: list[UploadFile]):
     observation_nc.close()
     geolocation_nc.close()
 
-    return JSONResponse(content=geojson_string, media_type="application/geo+json")
+    geojson = {
+        "points": geojson_points,
+        "convex": geojson_convex
+    }
+
+    return JSONResponse(content=geojson, media_type="application/geo+json")
