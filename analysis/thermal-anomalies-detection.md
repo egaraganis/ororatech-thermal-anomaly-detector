@@ -126,4 +126,4 @@ That gives a first initial rough threshold at around the 25% of the max value. T
 
 Details about the 25-percent threshold will be further elaborated [here](./25-percent-threshold.md).
 
-## Georgraphical interpretation and correlation
+## Geographical interpretation and correlation

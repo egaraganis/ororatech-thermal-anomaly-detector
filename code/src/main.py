@@ -1,7 +1,7 @@
 from typing import Annotated
 from constants import homepage
 from fastapi.responses import HTMLResponse
-from lib import debug_import_data
+from lib import detect_thermal_anomalies
 from fastapi import FastAPI, File, UploadFile, HTTPException
 
 app = FastAPI()
@@ -12,7 +12,7 @@ async def debug_input_files(
         list[UploadFile], File(description="Multiple files as UploadFile")
     ],
 ):
-    results = await debug_import_data(files)
+    results = await detect_thermal_anomalies(files)
     return results
 
 @app.get("/")

@@ -1,10 +1,27 @@
 from fastapi import UploadFile, HTTPException
+from fastapi.responses import JSONResponse
 import netCDF4
 import io
 import tempfile
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import geojson
+
+def debug_hotpixes_candidates(hotpixel_candidates):
+    for pos in hotpixel_candidates:
+        scan_line, pixel = pos
+        value = data[scan_line, pixel]
+        print(f"  Scan line {scan_line}, Pixel {pixel}: Value = {value}")  
+
+def debug_nc_files(observation_nc, geolocation_nc):
+    print("---- Observation Data - NetCDF file ----")
+    print(observation_nc)
+
+    print("\n\n\n")
+    
+    print("---- Geolocation Data - NetCDF file ----")
+    print(geolocation_nc)
 
 def validate_uploaded_netcdf_files(files: list[UploadFile]):
     if len(files) != 2:
@@ -51,7 +68,7 @@ async def read_netcdf_as_dataset(file):
         finally:
             tmp.close()
 
-def analyze_observation_data(observation_nc):
+def find_mix_max_and_contour_plot(observation_nc):
     print("\n\n\n")
 
     M13 = observation_nc.groups["observation_data"].variables["M13"]
@@ -77,21 +94,48 @@ def analyze_observation_data(observation_nc):
     plt.ylabel('Scan Line')
     plt.show()
 
-async def debug_import_data(files: list[UploadFile]):
+def apply_25_percent_threshold_and_return_geojson_points(observation_nc, geolocation_nc):
+    M13 = observation_nc.groups["observation_data"].variables["M13"]
+    data = M13[:]
+
+    max_value = data.max()
+    threshold = max_value * 0.25
+
+    hotpixel_candidates = np.argwhere(data > threshold)
+    return hotpixel_candidates_to_geojson_points(data, geolocation_nc, hotpixel_candidates)
+
+def hotpixel_candidates_to_geojson_points(observation_data, geolocation_nc, hotpixel_candidates):
+    lats = geolocation_nc.groups["geolocation_data"].variables["latitude"][:]
+    longs = geolocation_nc.groups["geolocation_data"].variables["longitude"][:]
+
+    features = []
+    for pos in hotpixel_candidates:
+        scan_line, pixel = pos
+        value = observation_data[scan_line, pixel]
+        longitude = longs[scan_line, pixel]
+        latitude = lats[scan_line, pixel]
+        
+        feature = geojson.Feature(
+            geometry=geojson.Point((float(longitude), float(latitude))),
+            properties={
+                "value": float(value),
+                "scan_line": int(scan_line),
+                "pixel": int(pixel)
+            }
+        )
+        features.append(feature)
+    
+    feature_collection = geojson.FeatureCollection(features)
+    return feature_collection
+
+async def detect_thermal_anomalies(files: list[UploadFile]):
     validated_netcdf_files = validate_uploaded_netcdf_files(files)
 
     observation_nc, o_tmp_file_name = await read_netcdf_as_dataset(validated_netcdf_files['observation_data'])
     geolocation_nc, g_tmp_file_name = await read_netcdf_as_dataset(validated_netcdf_files['geolocation_data'])
 
-    print("---- Observation Data - NetCDF file ----")
-    print(observation_nc)
-
-    print("\n\n\n")
-    
-    print("---- Geolocation Data - NetCDF file ----")
-    print(geolocation_nc)
-
-    analyze_observation_data(observation_nc)
+    #find_mix_max_and_contour_plot(observation_nc)
+    geojson_string = apply_25_percent_threshold_and_return_geojson_points(observation_nc, geolocation_nc)
 
     os.remove(o_tmp_file_name)
     os.remove(g_tmp_file_name)
@@ -99,7 +143,4 @@ async def debug_import_data(files: list[UploadFile]):
     observation_nc.close()
     geolocation_nc.close()
 
-    return {
-        "observation data": validated_netcdf_files['observation_data'].filename,
-        "geolocation data": validated_netcdf_files['geolocation_data'].filename
-    }
+    return JSONResponse(content=geojson_string, media_type="application/geo+json")
