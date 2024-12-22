@@ -38,40 +38,40 @@ In order to understand the data, I'll identify the MIN-MAX value of each overpas
 Min value: 0.0010805600322782993 at scan line 2761, pixel 3173  
 Max value: 81.32862854003906 at scan line 1035, pixel 1514
 
-![M13 Color Contour - 1](../p-color-contour-1000-m13-0.png)
-![M13 Color Contour - 2](../p-color-contour-1000-m13-1.png)
-![M13 Color Contour - 3](../p-color-contour-1000-m13-2.png)
-![M13 Color Contour - 3](../p-color-contour-1000-m13-3.png)
+![M13 Color Contour - 1](../img/p-color-contour-1000-m13-0.png)
+![M13 Color Contour - 2](../img/p-color-contour-1000-m13-1.png)
+![M13 Color Contour - 3](../img/p-color-contour-1000-m13-2.png)
+![M13 Color Contour - 3](../img/p-color-contour-1000-m13-3.png)
 
 ### 2118
 
 Min value: 0.009168829768896103 at scan line 1847, pixel 153  
 Max value: 264.317626953125 at scan line 2925, pixel 1116
 
-![M13 Color Contour - 1](../p-color-contour-2118-m13-0.png)
-![M13 Color Contour - 2](../p-color-contour-2118-m13-1.png)
-![M13 Color Contour - 3](../p-color-contour-2118-m13-2.png)
-![M13 Color Contour - 3](../p-color-contour-2118-m13-3.png)
+![M13 Color Contour - 1](../img/p-color-contour-2118-m13-0.png)
+![M13 Color Contour - 2](../img/p-color-contour-2118-m13-1.png)
+![M13 Color Contour - 3](../img/p-color-contour-2118-m13-2.png)
+![M13 Color Contour - 3](../img/p-color-contour-2118-m13-3.png)
 
 ### 0942
 
 Min value: 0.0010805600322782993 at scan line 1510, pixel 2420  
 Max value: 16.404090881347656 at scan line 1075, pixel 1237
 
-![M13 Color Contour - 1](../p-color-contour-0942-m13-0.png)
-![M13 Color Contour - 2](../p-color-contour-0942-m13-1.png)
-![M13 Color Contour - 3](../p-color-contour-0942-m13-2.png)
-![M13 Color Contour - 3](../p-color-contour-0942-m13-3.png)
+![M13 Color Contour - 1](../img/p-color-contour-0942-m13-0.png)
+![M13 Color Contour - 2](../img/p-color-contour-0942-m13-1.png)
+![M13 Color Contour - 3](../img/p-color-contour-0942-m13-2.png)
+![M13 Color Contour - 3](../img/p-color-contour-0942-m13-3.png)
 
 ### 2100
 
 Min value: 0.017257098108530045 at scan line 72, pixel 179  
 Max value: 145.32301330566406 at scan line 2869, pixel 1418
 
-![M13 Color Contour - 1](../p-color-contour-2100-m13-0.png)
-![M13 Color Contour - 2](../p-color-contour-2100-m13-1.png)
-![M13 Color Contour - 3](../p-color-contour-2100-m13-2.png)
-![M13 Color Contour - 3](../p-color-contour-2100-m13-3.png)
+![M13 Color Contour - 1](../img/p-color-contour-2100-m13-0.png)
+![M13 Color Contour - 2](../img/p-color-contour-2100-m13-1.png)
+![M13 Color Contour - 3](../img/p-color-contour-2100-m13-2.png)
+![M13 Color Contour - 3](../img/p-color-contour-2100-m13-3.png)
 
 ### Initial observation
 
@@ -82,8 +82,8 @@ Let's observe and understand the initial data and diagrams:
 Min value: 0.0010805600322782993 at scan line 2761, pixel 3173  
 Max value: 81.32862854003906 at scan line 1035, pixel 1514
 
-![1000 array](../1000-array.png)
-![M13 Color Contour - 3](../p-color-contour-1000-m13-3.png)
+![1000 array](../img/1000-array.png)
+![M13 Color Contour - 3](../img/p-color-contour-1000-m13-3.png)
 
 Given the max value of 81.32, there's a visible surrounding increased radiance, at around 20-25.
 
@@ -97,8 +97,8 @@ That might be an indicator of first threshold.
 Min value: 0.009168829768896103 at scan line 1847, pixel 153  
 Max value: 264.317626953125 at scan line 2925, pixel 1116
 
-![1000 array](../2118-array.png)
-![M13 Color Contour - 3](../p-color-contour-2118-m13-3.png)
+![1000 array](../img/2118-array.png)
+![M13 Color Contour - 3](../img/p-color-contour-2118-m13-3.png)
 
 Given the above estimates, the 25% of max value is around 65, which also is visible with plain eye and indicates a fire-background.
 
@@ -107,8 +107,8 @@ Given the above estimates, the 25% of max value is around 65, which also is visi
 Min value: 0.0010805600322782993 at scan line 1510, pixel 2420  
 Max value: 16.404090881347656 at scan line 1075, pixel 1237
 
-![M13 Color Contour - 3](../0942-array.png)
-![M13 Color Contour - 3](../p-color-contour-0942-m13-3.png)
+![M13 Color Contour - 3](../img/0942-array.png)
+![M13 Color Contour - 3](../img/p-color-contour-0942-m13-3.png)
 
 In similar manner, the 25% of max value is around 4, which agains indicates the visible spectrum of the potential fire.
 
@@ -117,8 +117,8 @@ In similar manner, the 25% of max value is around 4, which agains indicates the 
 Min value: 0.017257098108530045 at scan line 72, pixel 179  
 Max value: 145.32301330566406 at scan line 2869, pixel 1418
 
-![M13 Color Contour - 3](../2100-array.png)
-![M13 Color Contour - 3](../p-color-contour-2100-m13-3.png)
+![M13 Color Contour - 3](../img/2100-array.png)
+![M13 Color Contour - 3](../img/p-color-contour-2100-m13-3.png)
 
 For one last time, the 25% of max value is 36.25.
 

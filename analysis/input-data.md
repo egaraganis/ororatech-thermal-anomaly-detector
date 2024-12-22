@@ -33,11 +33,11 @@ The M13_Quality_Flags indicate specific issues or conditions affecting the data 
 
 ##### M13 Plot: Color contour X: number of line, Y: number of pixels
 
-![color-contour-m13-1](../M13_in_VNP02MOD_NRT.A2020233.1000.001.png)
+![color-contour-m13-1](../img/M13_in_VNP02MOD_NRT.A2020233.1000.001.png)
 
 ##### M13 Brightness Temperature LUT Plot: Number of LUT values for the X axis
 
-![line-plot-m13-brightness-temp-1](../M13_brightness_temperature_l_in_VNP02MOD_NRT.A2020233.1000.001.png)
+![line-plot-m13-brightness-temp-1](../img/M13_brightness_temperature_l_in_VNP02MOD_NRT.A2020233.1000.001.png)
 
 -81.15°C to 392.75°C
 
@@ -51,9 +51,9 @@ As a VNP03 file, this file contains the **geographical coordinates of each pixel
 
 #### Geolocation data: Understanding the data
 
-![longitude_plot_1](../longitude_in_VNP03MOD_NRT.A2020233.1000.001.png)
-![latitude_plot_1](../latitude_in_VNP03MOD_NRT.A2020233.1000.001.png)
-![height_plot_1](../height_in_VNP03MOD_NRT.A2020233.1000.001.png)
+![longitude_plot_1](../img/longitude_in_VNP03MOD_NRT.A2020233.1000.001.png)
+![latitude_plot_1](../img/latitude_in_VNP03MOD_NRT.A2020233.1000.001.png)
+![height_plot_1](../img/height_in_VNP03MOD_NRT.A2020233.1000.001.png)
 
 ## Questions
 
