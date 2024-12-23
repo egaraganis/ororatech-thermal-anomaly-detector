@@ -7,7 +7,7 @@ from fastapi import FastAPI, File, UploadFile, HTTPException
 app = FastAPI()
 
 @app.post("/detect_thermal_anomalies/")
-async def debug_input_files(
+async def detect_thermal_anomalies_controller(
     files: Annotated[
         list[UploadFile], File(description="Multiple files as UploadFile")
     ],
