@@ -99,7 +99,6 @@ def find_mix_max_and_contour_plot(observation_nc):
     plt.show()
 
 def calculate_celcius_with_plancks_equation(radiance):
-
     exponent_part = plancks_exponent_part_numerator / (radiance*10**6 * lamnda_m_5)
     T_kelvin = plancks_numerator / (plancks_denominator * math.log(1 + exponent_part))
 
@@ -119,7 +118,7 @@ def apply_plancks_equation_to_observation_data_and_color_contour(observation_nc)
 
     plt.figure(figsize=(8, 6))
     
-    contour = plt.contourf(calculated_celcius_data, cmap='coolwarm', levels=20)  # You can adjust the number of levels
+    contour = plt.contourf(calculated_celcius_data, cmap='coolwarm', levels=20)
     plt.colorbar(contour)
     
     plt.title("Temperature Distribution (°C)")
@@ -147,6 +146,38 @@ def apply_25_percent_threshold_and_return_geojson_convex(observation_nc, geoloca
     threshold = max_value * 0.25
 
     hotpixel_candidates = np.argwhere(data > threshold)
+
+    hotpixel_candidates_with_geospatial_coords = hotpixel_candidates_to_geospatial_coords(geolocation_nc, hotpixel_candidates)
+
+    geojson = cluster_hotpixel_candidates_based_on_geospatial_coords_and_return_geojson_convex_for_each(hotpixel_candidates_with_geospatial_coords)
+
+    return geojson
+
+def apply_60_fixed_radiance_threshold_and_return_geojson_points(observation_nc, geolocation_nc):
+    M13 = observation_nc.groups["observation_data"].variables["M13"]
+    data = M13[:]
+
+    max_value = data.max()
+    threshold = 60
+
+    hotpixel_candidates = np.argwhere(data > threshold)
+
+    if not hotpixel_candidates.size > 0:
+        return {}
+
+    return hotpixel_candidates_to_geojson_points(data, geolocation_nc, hotpixel_candidates)
+
+def apply_60_fixed_radiance_threshold_and_return_geojson_convex(observation_nc, geolocation_nc):
+    M13 = observation_nc.groups["observation_data"].variables["M13"]
+    data = M13[:]
+
+    max_value = data.max()
+    threshold = 60
+
+    hotpixel_candidates = np.argwhere(data > threshold)
+
+    if not hotpixel_candidates.size > 0:
+        return {}
 
     hotpixel_candidates_with_geospatial_coords = hotpixel_candidates_to_geospatial_coords(geolocation_nc, hotpixel_candidates)
 
@@ -238,10 +269,14 @@ async def detect_thermal_anomalies(files: list[UploadFile]):
     geolocation_nc, g_tmp_file_name = await read_netcdf_as_dataset(validated_netcdf_files['geolocation_data'])
 
     #find_mix_max_and_contour_plot(observation_nc)
-    #geojson_points = apply_25_percent_threshold_and_return_geojson_points(observation_nc, geolocation_nc)
-    #geojson_convex = apply_25_percent_threshold_and_return_geojson_convex(observation_nc, geolocation_nc)
+    
+    geojson_points = apply_25_percent_threshold_and_return_geojson_points(observation_nc, geolocation_nc)
+    geojson_convex = apply_25_percent_threshold_and_return_geojson_convex(observation_nc, geolocation_nc)
 
-    apply_plancks_equation_to_observation_data_and_color_contour(observation_nc)
+    #apply_plancks_equation_to_observation_data_and_color_contour(observation_nc)
+
+    # geojson_points = apply_60_fixed_radiance_threshold_and_return_geojson_points(observation_nc, geolocation_nc)
+    # geojson_convex = apply_60_fixed_radiance_threshold_and_return_geojson_convex(observation_nc, geolocation_nc)
 
     os.remove(o_tmp_file_name)
     os.remove(g_tmp_file_name)
@@ -249,11 +284,11 @@ async def detect_thermal_anomalies(files: list[UploadFile]):
     observation_nc.close()
     geolocation_nc.close()
 
-    # geojson = {
-    #     "points": geojson_points,
-    #     "convex": geojson_convex
-    # }
+    geojson = {
+        "points": geojson_points,
+        "convex": geojson_convex
+    }
 
-    geojson = ""
+    # geojson = ""
 
     return JSONResponse(content=geojson, media_type="application/geo+json")

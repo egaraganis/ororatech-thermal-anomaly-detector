@@ -307,3 +307,108 @@ Have research and successfuly completed a first implementation circle, I can rec
 5. Create a convex or/and concave to get the geojson polygons
 
 Further steps include experimenting with each one of the above steps, like applying other thresholds, clustering with different candidates, effectively creating convex or concave for each cluster.
+
+## Beyond 25% rough threshold
+
+### Planck's Law
+
+Now that we have a rough threshold for detecting possible hotpixels candidates, we can further delve into the domain. Our current threshold is derived based on each overpass. But since our overpass is with a 48-hour span over the same spot, then we would expect the threshold to be
+more of a fixed value, across overpasses.
+
+The M13 filter on the VIIRS (Visible Infrared Imaging Radiometer Suite) sensor is part of its thermal infrared channels, specifically designed to measure emitted radiance from the Earth. Radiance measured by the M13 filter can be converted to temperature using Planck's law and the inverse Planck function.
+
+Based on the following Python implementation, we will color contour the available overpasses:
+
+```python
+def calculate_celcius_with_plancks_equation(radiance):
+    exponent_part = plancks_exponent_part_numerator / (radiance*10**6 * lamnda_m_5)
+    T_kelvin = plancks_numerator / (plancks_denominator * math.log(1 + exponent_part))
+
+    T_celsius = T_kelvin - 273.15
+    return T_celsius
+
+def apply_plancks_equation_to_observation_data_and_color_contour(observation_nc):
+    M13 = observation_nc.groups["observation_data"].variables["M13"]
+    data = M13[:]
+
+    calculated_celcius_per_pixel = []
+
+    for pixel_radiance in data.flatten():
+        calculated_celcius_per_pixel.append(calculate_celcius_with_plancks_equation(pixel_radiance))
+
+    calculated_celcius_data = np.array(calculated_celcius_per_pixel).reshape(data.shape)
+
+    plt.figure(figsize=(8, 6))
+    
+    contour = plt.contourf(calculated_celcius_data, cmap='coolwarm', levels=20)
+    plt.colorbar(contour)
+    
+    plt.title("Temperature Distribution (°C)")
+    plt.xlabel("Pixel (X)")
+    plt.ylabel("Scanline (Y)")
+    
+    plt.show()
+```
+
+Let's see how temperature varies across our overpasses
+
+#### 1000
+
+![1000-Color-Contour-Celcius-1](../img/1000-celcius-1.png)
+![1000-Color-Contour-Celcius-2](../img/1000-celcius-2.png)
+![1000-Color-Contour-Celcius-3](../img/1000-celcius-3.png)
+
+#### 2118
+
+![2118-Color-Contour-Celcius-1](../img/2118-celcius-1.png)
+![2118-Color-Contour-Celcius-2](../img/2118-celcius-2.png)
+![2118-Color-Contour-Celcius-3](../img/2118-celcius-3.png)
+
+#### 0942
+
+![0942-Color-Contour-Celcius-1](../img/0942-celcius-1.png)
+![0942-Color-Contour-Celcius-2](../img/0942-celcius-2.png)
+![0942-Color-Contour-Celcius-3](../img/0942-celcius-3.png)
+
+#### 2100
+
+![2100-Color-Contour-Celcius-1](../img/2100-celcius-1.png)
+![2100-Color-Contour-Celcius-2](../img/2100-celcius-2.png)
+![2100-Color-Contour-Celcius-3](../img/2100-celcius-3.png)
+
+A brief research on fire temperature behavior suggests that:
+
+- At temperatures around 200°C-600°C, the fire may be in the smoldering stage, where organic material, such as dead wood or leaf litter, slowly burns without producing visible flames. This can happen in the understory or the forest floor, and while it's not as intense as a full blaze, it can still cause damage and spread over time, especially in dry conditions.
+- Crown Fire (High Intensity): Temperature: 800°C to 1,200°C (1,472°F to 2,192°F)
+- Flaming Combustion (General Flames): Temperature: 600°C to 1,000°C (1,112°F to 1,832°F)
+- Hot Spots/Intense Fires: Temperature: 1,200°C to 1,400°C (2,192°F to 2,552°F)
+
+### The 60 W/m²·sr·μm* fixed threshold
+
+Based on the above, we will apply a uniform fixed threshold over all overpasses that being at 60W/m²·sr·μm*, meaing 200.12°C, which can be an indicator of even smoldering fires.
+
+#### 1000
+
+![1000-60-Geopoints](../img/1000-60-geopoints.png)
+
+#### 2118
+
+![2118-60-Geopoints](../img/2118-60-geopoints.png)
+
+#### 0942
+
+No geopoints yielded, which is logical, since the max Celcius is just above 120°C.
+
+#### 2100
+
+![2100-60-Geopoints](../img/2100-60-geopoints.png)
+
+### Other fire-detection approaches
+
+Of course both of the above proposed thresholds are rough and naive, that need further investigation both vertically and horizontally. Before conducting further research on current bibliography, I would also to explore the following factors and approaches:
+
+1. Compare hotpixel candidates with the median of non-firebackground
+2. Compare data and radiance with other days and time of the year
+3. Experiment with other bands and filters
+4. Validate data with real images
+5. Consider other factors, like clouds, surface's and more
