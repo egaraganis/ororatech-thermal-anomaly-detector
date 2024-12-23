@@ -124,8 +124,6 @@ For one last time, the 25% of max value is 36.25.
 
 That gives a first initial rough threshold at around the 25% of the max value. This will be our starting point for the implementation.
 
-Details about the 25-percent threshold will be further elaborated [here](./25-percent-threshold.md).
-
 ## Geographical interpretation and correlation
 
 ### Geolocating hotpixels
