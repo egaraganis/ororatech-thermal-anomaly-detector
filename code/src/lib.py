@@ -31,9 +31,9 @@ def validate_uploaded_netcdf_files(files: list[UploadFile]):
     if len(files) != 2:
         raise HTTPException(status_code=400, detail="You must upload exactly two files.")
     
-    for file in files:
-        if file.content_type != "application/x-netcdf":
-            raise HTTPException(status_code=400, detail=f"Invalid file type: {file.filename}. Expecting: 'application/x-netcdf'.")
+    # for file in files:
+    #     if file.content_type != "application/x-netcdf":
+    #         raise HTTPException(status_code=400, detail=f"Invalid file type: {file.filename}. Expecting: 'application/x-netcdf'.")
     
     file1_first_token = files[0].filename[:5]
     file1_second_token = files[0].filename[5:]
