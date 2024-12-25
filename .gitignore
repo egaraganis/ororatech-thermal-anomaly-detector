@@ -2,3 +2,4 @@ PanoplyJ/*
 Suomi-NPP sample data/*
 __pycache__/
 *.pyc
+.venv/

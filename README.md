@@ -28,7 +28,7 @@ The points value contains the potential hotpixel candidates as GeoPoints, while 
 
 ### Next Steps & Debt
 
-- Research bibliography, further investigation and apply and validate state-of-the-art algorithms regarding the domain of the fire and hotpixel detection problem.
+- Research bibliography, further investigation and apply and validate state-of-the-art algorithms regarding the domain of the fire and hotpixel detection problem. I'll continue the research thread from the detailed analysis documentation [here](./analysis/thermal-anomalies-detection.md#other-fire-detection-approaches)
 - Engineering-wise, the code is not so DRY, for the time being. There can be many wrappers and design patterns applied, to make the DX better. You know how it goes, though, premature optimization is the root of all evit! :)
 - I tried to create a convex and concave using `scikit`, `geopandas`, `shapely` over my clusters but I didn't manage to deliver some quality results, so for the time being I let my kinda sketchy Polygons to stand out. Elastic created clusters and heatmaps for me, in the following section, though.
 

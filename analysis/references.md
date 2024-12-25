@@ -13,7 +13,9 @@ Resources on Fire Detection:
 1. https://www.researchgate.net/publication/260010654_The_New_VIIRS_375_m_active_fire_detection_data_product_Algorithm_description_and_initial_assessment
 2. https://www.researchgate.net/publication/307583646_Hot_Pixel_Identification_using_Satellite_Hyper-spectral_Data
 3. https://www.sciencedirect.com/science/article/abs/pii/S0378377421000287
-4. https://lpdaac.usgs.gov/data/get-started-data/collection-overview/missions/s-npp-nasa-viirs-overview/
+4. https://lpdaac.usgs.gov/data/get-started-data/collection-overview/missions/s-npp-nasa-viirs-overview
+5. https://www.mdpi.com/2072-4292/15/5/1189
+6. https://www.ssd.noaa.gov/PS/FIRE/Layers/VIIRS/viirs.html
 
 General Resources
 
