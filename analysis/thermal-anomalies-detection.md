@@ -407,6 +407,6 @@ Of course both of the above proposed thresholds are rough and naive, that need f
 
 1. Compare hotpixel candidates with the median of non-firebackground
 2. Compare data and radiance with other days and time of the year
-3. Experiment with other bands and filters (for example pixel lumens to Kelvin from other bands, if captured?)
+3. Experiment with other bands and filters (for example pixel lumens to Kelvin from other bands, if captured? What's the pixel saturation called so often in the paper). Contextual approach or combination of factors?
 4. Validate data with real images
-5. Consider other factors, like clouds, surface's and more
+5. Consider other factors, like clouds, surface's, magnetic anomalies and more
