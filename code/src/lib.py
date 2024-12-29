@@ -7,10 +7,12 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import geojson
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon, Point, mapping
 from sklearn.cluster import DBSCAN
 import math
 from constants import plancks_exponent_part_numerator, lamnda_m_5, plancks_numerator, plancks_denominator
+from scipy.spatial import ConvexHull
+import alphashape
 
 def debug_hotpixes_candidates(hotpixel_candidates):
     for pos in hotpixel_candidates:
@@ -73,13 +75,9 @@ async def read_netcdf_as_dataset(file):
             tmp.close()
 
 def find_mix_max_and_contour_plot(observation_nc):
-    print("\n\n\n")
-
     M13 = observation_nc.groups["observation_data"].variables["M13"]
-    #print(M13)
 
     data = M13[:]
-    #print(data)
 
     min_value = data.min()
     max_value = data.max()
@@ -87,8 +85,8 @@ def find_mix_max_and_contour_plot(observation_nc):
     min_position = np.unravel_index(data.argmin(), M13.shape)
     max_position = np.unravel_index(data.argmax(), M13.shape)
 
-    print(f"Minimum value: {min_value} at scan line {min_position[0]}, pixel {min_position[1]}")
-    print(f"Maximum value: {max_value} at scan line {max_position[0]}, pixel {max_position[1]}")
+    print(f"Min value: {min_value} at scan line {min_position[0]}, pixel {min_position[1]}")
+    print(f"Max value: {max_value} at scan line {max_position[0]}, pixel {max_position[1]}")
 
     plt.figure(figsize=(10, 6))
     plt.contourf(data, levels=100, cmap='viridis')
@@ -138,7 +136,7 @@ def apply_25_percent_threshold_and_return_geojson_points(observation_nc, geoloca
 
     return hotpixel_candidates_to_geojson_points(data, geolocation_nc, hotpixel_candidates)
 
-def apply_25_percent_threshold_and_return_geojson_convex(observation_nc, geolocation_nc):
+def apply_25_percent_threshold_and_return_geojson_plain_polygons(observation_nc, geolocation_nc):
     M13 = observation_nc.groups["observation_data"].variables["M13"]
     data = M13[:]
 
@@ -149,7 +147,37 @@ def apply_25_percent_threshold_and_return_geojson_convex(observation_nc, geoloca
 
     hotpixel_candidates_with_geospatial_coords = hotpixel_candidates_to_geospatial_coords(geolocation_nc, hotpixel_candidates)
 
-    geojson = cluster_hotpixel_candidates_based_on_geospatial_coords_and_return_geojson_convex_for_each(hotpixel_candidates_with_geospatial_coords)
+    geojson = cluster_hotpixel_candidates_based_on_geospatial_coords_and_return_geojson_plain_polygon_for_each(hotpixel_candidates_with_geospatial_coords)
+
+    return geojson
+
+def apply_25_percent_threshold_and_return_geojson_convex_polygons(observation_nc, geolocation_nc):
+    M13 = observation_nc.groups["observation_data"].variables["M13"]
+    data = M13[:]
+
+    max_value = data.max()
+    threshold = max_value * 0.25
+
+    hotpixel_candidates = np.argwhere(data > threshold)
+
+    hotpixel_candidates_with_geospatial_coords = hotpixel_candidates_to_geospatial_coords(geolocation_nc, hotpixel_candidates)
+
+    geojson = cluster_hotpixel_candidates_based_on_geospatial_coords_and_return_geojson_convex_polygon_for_each(hotpixel_candidates_with_geospatial_coords)
+
+    return geojson
+
+def apply_25_percent_threshold_and_return_geojson_concave_polygons(observation_nc, geolocation_nc):
+    M13 = observation_nc.groups["observation_data"].variables["M13"]
+    data = M13[:]
+
+    max_value = data.max()
+    threshold = max_value * 0.25
+
+    hotpixel_candidates = np.argwhere(data > threshold)
+
+    hotpixel_candidates_with_geospatial_coords = hotpixel_candidates_to_geospatial_coords(geolocation_nc, hotpixel_candidates)
+
+    geojson = cluster_hotpixel_candidates_based_on_geospatial_coords_and_return_geojson_concave_polygon_for_each(hotpixel_candidates_with_geospatial_coords)
 
     return geojson
 
@@ -167,7 +195,7 @@ def apply_60_fixed_radiance_threshold_and_return_geojson_points(observation_nc, 
 
     return hotpixel_candidates_to_geojson_points(data, geolocation_nc, hotpixel_candidates)
 
-def apply_60_fixed_radiance_threshold_and_return_geojson_convex(observation_nc, geolocation_nc):
+def apply_60_fixed_radiance_threshold_and_return_geojson_plain_polygons(observation_nc, geolocation_nc):
     M13 = observation_nc.groups["observation_data"].variables["M13"]
     data = M13[:]
 
@@ -181,36 +209,33 @@ def apply_60_fixed_radiance_threshold_and_return_geojson_convex(observation_nc, 
 
     hotpixel_candidates_with_geospatial_coords = hotpixel_candidates_to_geospatial_coords(geolocation_nc, hotpixel_candidates)
 
-    geojson = cluster_hotpixel_candidates_based_on_geospatial_coords_and_return_geojson_convex_for_each(hotpixel_candidates_with_geospatial_coords)
+    geojson = cluster_hotpixel_candidates_based_on_geospatial_coords_and_return_geojson_plain_polygon_for_each(hotpixel_candidates_with_geospatial_coords)
 
     return geojson
 
-def cluster_hotpixel_candidates_based_on_geospatial_coords_and_return_geojson_convex_for_each(hotpixel_candidates_with_geospatial_coords):
+def cluster_hotpixel_candidates_based_on_geospatial_coords(hotpixel_candidates_with_geospatial_coords):
     db = DBSCAN(eps=1, min_samples=3)
     labels = db.fit_predict(hotpixel_candidates_with_geospatial_coords)
-    
-    #print("Cluster labels for each point:", labels)
-    
-    cluster_points_dict = {}
+        
+    cluster_points_dictionary = {}
 
     for label, point in zip(labels, hotpixel_candidates_with_geospatial_coords):
-        if label not in cluster_points_dict:
-            cluster_points_dict[label] = []
-        cluster_points_dict[label].append(point)
+        if label not in cluster_points_dictionary:
+            cluster_points_dictionary[label] = []
+        cluster_points_dictionary[label].append(point)
 
-    geojson_data = {
-        "type": "FeatureCollection",
-        "features": []
-    }
-
-    for cluster_id, cluster_points in cluster_points_dict.items():
+    for cluster_id, cluster_points in cluster_points_dictionary.items():
         print(f"Cluster {cluster_id}:")
         print(np.array(cluster_points))
         print()
 
+    return cluster_points_dictionary
+
+def cluster_hotpixel_candidates_based_on_geospatial_coords_and_return_geojson_plain_polygon_for_each(hotpixel_candidates_with_geospatial_coords):
+    cluster_points_dictionary = cluster_hotpixel_candidates_based_on_geospatial_coords(hotpixel_candidates_with_geospatial_coords)
     features = []
     
-    for cluster_id, points in cluster_points_dict.items():
+    for cluster_id, points in cluster_points_dictionary.items():
         if cluster_id == -1:
             points_as_geojson = [geojson.Point(point) for point in points]
             features.extend([geojson.Feature(geometry=point, properties={"cluster": str(cluster_id)}) for point in points_as_geojson])
@@ -220,7 +245,51 @@ def cluster_hotpixel_candidates_based_on_geospatial_coords_and_return_geojson_co
             features.append(feature)
 
     feature_collection = geojson.FeatureCollection(features)
+    return feature_collection
 
+def cluster_hotpixel_candidates_based_on_geospatial_coords_and_return_geojson_convex_polygon_for_each(hotpixel_candidates_with_geospatial_coords):
+    cluster_points_dictionary = cluster_hotpixel_candidates_based_on_geospatial_coords(hotpixel_candidates_with_geospatial_coords)
+
+    features = []
+    for cluster_id, points in cluster_points_dictionary.items():
+        if cluster_id == -1:
+            points_as_geojson = [geojson.Point(point) for point in points]
+            features.extend([geojson.Feature(geometry=point, properties={"cluster": str(cluster_id)}) for point in points_as_geojson])
+        else:
+            points_np = np.array(points)
+            if len(points_np) >= 3:
+                hull = ConvexHull(points_np)
+                hull_points = points_np[hull.vertices]
+                polygon = Polygon(hull_points)
+                feature = geojson.Feature(geometry=polygon, properties={"cluster": str(cluster_id)})
+                features.append(feature)
+
+    feature_collection = geojson.FeatureCollection(features)
+    return feature_collection
+
+def cluster_hotpixel_candidates_based_on_geospatial_coords_and_return_geojson_concave_polygon_for_each(hotpixel_candidates_with_geospatial_coords):
+    cluster_points_dictionary = cluster_hotpixel_candidates_based_on_geospatial_coords(hotpixel_candidates_with_geospatial_coords)
+
+    features = []
+    alpha = 4.0
+
+    for cluster_id, points in cluster_points_dictionary.items():
+        if cluster_id == -1:
+            points_as_geojson = [geojson.Point(point) for point in points]
+            features.extend([geojson.Feature(geometry=point, properties={"cluster": str(cluster_id)}) for point in points_as_geojson])
+        else:
+            points_np = np.array(points)
+            if len(points_np) >= 3:
+                concave_hull = alphashape.alphashape(points_np, alpha)
+                if isinstance(concave_hull, Polygon):
+                    feature = geojson.Feature(geometry=mapping(concave_hull), properties={"cluster": str(cluster_id)})
+                    features.append(feature)
+                elif concave_hull.geom_type == "MultiPolygon":
+                    for geom in concave_hull.geoms:
+                        feature = geojson.Feature(geometry=mapping(geom), properties={"cluster": str(cluster_id)})
+                        features.append(feature)
+
+    feature_collection = geojson.FeatureCollection(features)
     return feature_collection
 
 def hotpixel_candidates_to_geospatial_coords(geolocation_nc, hotpixel_candidates):
@@ -269,14 +338,15 @@ async def detect_thermal_anomalies(files: list[UploadFile]):
     geolocation_nc, g_tmp_file_name = await read_netcdf_as_dataset(validated_netcdf_files['geolocation_data'])
 
     #find_mix_max_and_contour_plot(observation_nc)
-    
-    geojson_points = apply_25_percent_threshold_and_return_geojson_points(observation_nc, geolocation_nc)
-    geojson_convex = apply_25_percent_threshold_and_return_geojson_convex(observation_nc, geolocation_nc)
-
     #apply_plancks_equation_to_observation_data_and_color_contour(observation_nc)
 
-    # geojson_points = apply_60_fixed_radiance_threshold_and_return_geojson_points(observation_nc, geolocation_nc)
-    # geojson_convex = apply_60_fixed_radiance_threshold_and_return_geojson_convex(observation_nc, geolocation_nc)
+    geojson_points = apply_25_percent_threshold_and_return_geojson_points(observation_nc, geolocation_nc)
+    #geojson_polygons = apply_25_percent_threshold_and_return_geojson_plain_polygons(observation_nc, geolocation_nc)
+    geojson_convex = apply_25_percent_threshold_and_return_geojson_convex_polygons(observation_nc, geolocation_nc)
+    geojson_concave = apply_25_percent_threshold_and_return_geojson_concave_polygons(observation_nc, geolocation_nc)
+
+    #geojson_points = apply_60_fixed_radiance_threshold_and_return_geojson_points(observation_nc, geolocation_nc)
+    #geojson_convex = apply_60_fixed_radiance_threshold_and_return_geojson_plain_polygons(observation_nc, geolocation_nc)
 
     os.remove(o_tmp_file_name)
     os.remove(g_tmp_file_name)
@@ -286,7 +356,8 @@ async def detect_thermal_anomalies(files: list[UploadFile]):
 
     geojson = {
         "points": geojson_points,
-        "convex": geojson_convex
+        "convex": geojson_convex,
+        "concave": geojson_concave
     }
 
     # geojson = ""

@@ -16,6 +16,8 @@ Resources on Fire Detection:
 4. https://lpdaac.usgs.gov/data/get-started-data/collection-overview/missions/s-npp-nasa-viirs-overview
 5. https://www.mdpi.com/2072-4292/15/5/1189
 6. https://www.ssd.noaa.gov/PS/FIRE/Layers/VIIRS/viirs.html
+7. https://www.star.nesdis.noaa.gov/jpss/documents/ATBD/ATBD_NDE_AF_v2.6.pdf?utm_source=chatgpt.com
+8. https://viirsland.gsfc.nasa.gov/PDF/VIIRS_activefire_User_Guide.pdf?utm_source=chatgpt.com
 
 General Resources
 

@@ -20,7 +20,8 @@ There's a basic error handling, to ensure that the NetCDF files are those of the
 ```json
 {
     "points": <GeoJSON>,
-    "convex": <GeoJSON>
+    "convex": <GeoJSON>,
+    "concave": <GeoJSON>
 }
 ```
 
@@ -29,8 +30,9 @@ The points value contains the potential hotpixel candidates as GeoPoints, while 
 ### Next Steps & Debt
 
 - Research bibliography, further investigation and apply and validate state-of-the-art algorithms regarding the domain of the fire and hotpixel detection problem. I'll continue the research thread from the detailed analysis documentation [here](./analysis/thermal-anomalies-detection.md#other-fire-detection-approaches), as well as continue research from the [references](./analysis/references.md) section.
-- Engineering-wise, the code is not so DRY, for the time being. There can be many wrappers and design patterns applied, to make the DX better. You know how it goes, though, premature optimization is the root of all evit! :)
-- I tried to create a convex and concave using `scikit`, `geopandas`, `shapely` over my clusters but I didn't manage to deliver some quality results, so for the time being I let my kinda sketchy Polygons to stand out. Elastic created clusters and heatmaps for me, in the following section, though.
+- Engineering-wise, the code is not so DRY, for the time being. There can be many wrappers and design patterns applied, to make the DX better (You can find an initial brainstorming, [here](./analysis/refactor.md)). You know how it goes, though, premature optimization is the root of all evit! :)
+- Further experiment and fine-tune clustering, convex and concave creation.
+- Validate results with the overpass images.
 
 ### Extra experimentation
 
@@ -38,7 +40,7 @@ I integrated Elasticsearch & Kibana in the infra, in order to perform some sort 
 
 You can experiment with the tools, under `localhost:5601` for Kibana and `localhost:9200` for Elastic.
 
-Experimentation with [example geojson ouput](./2100-geojson.json).
+Experimentation with [example geojson ouput](./2100-25percent-geojson.json).
 
 ![Kibana-Import](./img/kibana-maps.png)
 

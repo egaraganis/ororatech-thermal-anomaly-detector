@@ -2,7 +2,7 @@
 
 The **M13 band** of the VIIRS sensor, is a part of the mid-infrared or thermal infrared spectrum, which is sensitive to heat emmisions, as fire emmits strong radiation. Radiance is the measure of intensity of radiation emmited or reflected by a surface, measured in units *W/m²·sr·μm*. The Earth view radiance refers to the radiance detected by the satellite sensor as it looks down at Earth's surface.
 
-A **band** refers to a spacific range og wavelengths of the electromagnetic spectrum that a satellite sensor is designed to detect. Each band collects information about the Earth's surface and atmosphere by measuring the energy (radiance) within its wavelength range. In **M13** band's case, potential fire pixels (hotspots) are pixels where the “Earth view radiance” in the spectral region between 3.973 μm and 4.128 μm.
+A **band** refers to a spacific range og wavelengths of the electromagnetic spectrum that a satellite sensor is designed to detect. Each band collects information about the Earth's surface and atmosphere by measuring the energy (radiance) within its wavelength range. In **M13** band's case, potential fire pixels (hotspots) are pixels where the “Earth view radiance” in the spectral region between 3.973 μm and 4.128 μm. To further **clarify** this, all pixels captured by the M13 band measure radiance in the spectral region of 3.973 μm to 4.128 μm because that is the band’s designed wavelength range. What distinguishes "potential fire pixels" (hotspots) is not that their radiance falls within this range—since all captured radiances are within it—but rather that they exceed a specific radiance threshold within this spectral region. This threshold indicates anomalously high energy, which is often associated with fires or hotspots.
 
 ## Idea
 
@@ -167,66 +167,45 @@ and we can locate our hotpixel candidats across the globe.
 #### 1000
 
 ![M13 Color Contour - 3](../img/p-color-contour-1000-m13-2.png)
-![1000 GeoPoints](../img/1000-geopoints.png)
+![1000 GeoPoints](../img/1000-25percent-geopoints.png)
 
 #### 2118
 
 ![2118 M13 Color Contour - 3](../img/p-color-contour-2118-m13-2.png)
-![1000 GeoPoints](../img/2118-geopoints.png)
+![1000 GeoPoints](../img/2118-25percent-geopoints.png)
 
 #### 0942
 
 ![2118 M13 Color Contour - 3](../img/p-color-contour-0942-m13-1.png)
-![0942 GeoPoints](../img/0942-geopoints.png)
+![0942 GeoPoints](../img/0942-25percent-geopoints.png)
 
 #### 2100
 
 ![2100 M13 Color Contour - 3](../img/p-color-contour-2100-m13-1.png)
-![2100 GeoPoints](../img/2100-geopoints.png)
+![2100 GeoPoints](../img/2100-25percent-geopoints.png)
 
-### Clustring, Convex and Concave
+### Clustering, Convex and Concave
 
-Since we have the list of geopoints, we can create clusters group fires together. I'll
-proceed with DBSCAN (Density-Based Spatial Clustering of Applications with Noise) algorithm to cluster geospatial coordinates based on their density. I could also use K-means, but I'll start with a density-based candidate.
+Since we have the list of geopoints, we can create clusters group fires together. I'll proceed with DBSCAN (Density-Based Spatial Clustering of Applications with Noise) algorithm to cluster geospatial coordinates based on their density. I could also use K-means, but I'll start with a density-based candidate, since it feels more appropriate in a fire scenario.
 
 ```python
-def cluster_hotpixel_candidates_based_on_geospatial_coords_and_return_geojson_convex_for_each(hotpixel_candidates_with_geospatial_coords):
+def cluster_hotpixel_candidates_based_on_geospatial_coords(hotpixel_candidates_with_geospatial_coords):
     db = DBSCAN(eps=1, min_samples=3)
     labels = db.fit_predict(hotpixel_candidates_with_geospatial_coords)
-    
-    #print("Cluster labels for each point:", labels)
-    
-    cluster_points_dict = {}
+        
+    cluster_points_dictionary = {}
 
     for label, point in zip(labels, hotpixel_candidates_with_geospatial_coords):
-        if label not in cluster_points_dict:
-            cluster_points_dict[label] = []
-        cluster_points_dict[label].append(point)
+        if label not in cluster_points_dictionary:
+            cluster_points_dictionary[label] = []
+        cluster_points_dictionary[label].append(point)
 
-    geojson_data = {
-        "type": "FeatureCollection",
-        "features": []
-    }
-
-    for cluster_id, cluster_points in cluster_points_dict.items():
+    for cluster_id, cluster_points in cluster_points_dictionary.items():
         print(f"Cluster {cluster_id}:")
         print(np.array(cluster_points))
         print()
 
-    features = []
-    
-    for cluster_id, points in cluster_points_dict.items():
-        if cluster_id == -1:
-            points_as_geojson = [geojson.Point(point) for point in points]
-            features.extend([geojson.Feature(geometry=point, properties={"cluster": str(cluster_id)}) for point in points_as_geojson])
-        else:
-            polygon = Polygon(points)
-            feature = geojson.Feature(geometry=polygon, properties={"cluster": str(cluster_id)})
-            features.append(feature)
-
-    feature_collection = geojson.FeatureCollection(features)
-
-    return feature_collection
+    return cluster_points_dictionary
 ```
 
 This will get us the following clusters:
@@ -283,16 +262,158 @@ Cluster 3:
  [-122.83301544   39.91775131]]
 ```
 
+Based on those clusters, we can start of forming initial rough polygons, without any transformation to convex or concave.
+
+```python
+def cluster_hotpixel_candidates_based_on_geospatial_coords_and_return_geojson_plain_polygon_for_each(hotpixel_candidates_with_geospatial_coords):
+    cluster_points_dictionary = cluster_hotpixel_candidates_based_on_geospatial_coords(hotpixel_candidates_with_geospatial_coords)
+    features = []
+    
+    for cluster_id, points in cluster_points_dictionary.items():
+        if cluster_id == -1:
+            points_as_geojson = [geojson.Point(point) for point in points]
+            features.extend([geojson.Feature(geometry=point, properties={"cluster": str(cluster_id)}) for point in points_as_geojson])
+        else:
+            polygon = Polygon(points)
+            feature = geojson.Feature(geometry=polygon, properties={"cluster": str(cluster_id)})
+            features.append(feature)
+
+    feature_collection = geojson.FeatureCollection(features)
+    return feature_collection
+```
+
 For the following points for example in the 2100 case
 
-![2100 GeoPoints](../img/2100-geopoints.png)
+![2100 GeoPoints](../img/2100-25percent-geopoints.png)
 
 We will get the following rough clusters polygons:
 
 ![2100 Polygons](../img/2100-polygons.png)
 
-    I experimented with various convex and concave hull algorithms but I haven't generated successful convex or concaves yet
+#### Current clustering state
 
+The current clustering implementation, although successfuly clusters suggested group of geopoints, it's far from perfect. 
+
+For example, in 1000 overpass case (with the 25% threshold):
+
+![1000 Geopoints using 25% threshold](../img/1000-25percent-geopoints.png)
+
+The current implementation will produce only one cluster (the -1 cluster are unclustered points):
+
+```
+Cluster -1:
+[[-120.71125793   40.34169769]
+ [-120.9099884    39.86947632]
+ [-122.13737488   37.09511185]
+ [-122.1144104    37.04351044]]
+
+Cluster 0:
+[[-122.63578796   40.09431458]
+ [-122.90533447   39.93113327]
+ [-122.64936829   39.79103851]
+ [-122.69385529   39.64148712]
+ [-122.74889374   39.64290237]
+ [-122.72521973   39.62568665]
+ [-122.71636963   39.62435532]
+ [-122.71795654   39.61776733]
+ [-122.68000793   39.58473206]
+ [-122.67118073   39.58339691]
+ [-122.66231537   39.58205795]
+ [-122.65348053   39.58071899]
+ [-122.64465332   39.57938766]
+ [-122.69702911   39.58108902]
+ [-122.68821716   39.57975388]
+ [-122.28173828   38.8516655 ]
+ [-122.40023041   38.78129959]
+ [-122.39141846   38.77993393]
+ [-122.38262177   38.7785759 ]
+ [-122.29696655   38.56147766]]
+```
+
+![1000 Convex Polygons using 25% threshold](../img/1000-25percent-convex-polygons.png)
+
+I would expect this at least create 2 clusters, between the upper and lower parts of the geopoints in the center.
+
+#### Convex
+
+In the polygon formation above, the geopoints of each cluster are being dumped in a geojson polygon, without any prior transformation. That leads to invalid polygons. For e.g. in 0942 overpass case (with the 25% threshold):
+
+![0942 Geopoints using 25% threshold](../img/0942-25percent-geopoints.png)
+
+This is the resulted polygons for each cluster:
+
+![0942 Plain Polygons using 25% threshold](../img/0942-25percent-plain-polygons.png)
+
+In order to combat this, I used SciPy's ConvexHull:
+
+```python
+def cluster_hotpixel_candidates_based_on_geospatial_coords_and_return_geojson_convex_polygon_for_each(hotpixel_candidates_with_geospatial_coords):
+    cluster_points_dictionary = cluster_hotpixel_candidates_based_on_geospatial_coords(hotpixel_candidates_with_geospatial_coords)
+
+    features = []
+    for cluster_id, points in cluster_points_dictionary.items():
+        if cluster_id == -1:
+            points_as_geojson = [geojson.Point(point) for point in points]
+            features.extend([geojson.Feature(geometry=point, properties={"cluster": str(cluster_id)}) for point in points_as_geojson])
+        else:
+            points_np = np.array(points)
+            if len(points_np) >= 3:
+                hull = ConvexHull(points_np)
+                hull_points = points_np[hull.vertices]
+                polygon = Polygon(hull_points)
+                feature = geojson.Feature(geometry=polygon, properties={"cluster": str(cluster_id)})
+                features.append(feature)
+
+    feature_collection = geojson.FeatureCollection(features)
+    return feature_collection
+```
+
+which, calculated the convex hull on the potential hotpixel candidates:
+
+![0942 Convex Polygons using 25% threshold](../img/0942-25percent-convex-polygons.png)
+
+    For once again, the convex hull creation needs further experimentation and fine-tuning (See part of cluster's polygon being on the sea). The implementation above doesn't take into consideration the earth's curved surface.
+
+#### Concave
+
+Now, for the concave part we will use `alphashape` library, that computes the concave hull for the given points and then with the `alpha` parameter we are going to further experiment for boundary tightness in order to generate different concave hulls.
+
+```python
+def cluster_hotpixel_candidates_based_on_geospatial_coords_and_return_geojson_concave_polygon_for_each(hotpixel_candidates_with_geospatial_coords):
+    cluster_points_dictionary = cluster_hotpixel_candidates_based_on_geospatial_coords(hotpixel_candidates_with_geospatial_coords)
+
+    features = []
+    alpha = 4.0
+
+    for cluster_id, points in cluster_points_dictionary.items():
+        if cluster_id == -1:
+            points_as_geojson = [geojson.Point(point) for point in points]
+            features.extend([geojson.Feature(geometry=point, properties={"cluster": str(cluster_id)}) for point in points_as_geojson])
+        else:
+            points_np = np.array(points)
+            if len(points_np) >= 3:
+                concave_hull = alphashape.alphashape(points_np, alpha)
+                if isinstance(concave_hull, Polygon):
+                    feature = geojson.Feature(geometry=mapping(concave_hull), properties={"cluster": str(cluster_id)})
+                    features.append(feature)
+                elif concave_hull.geom_type == "MultiPolygon":
+                    for geom in concave_hull.geoms:
+                        feature = geojson.Feature(geometry=mapping(geom), properties={"cluster": str(cluster_id)})
+                        features.append(feature)
+
+    feature_collection = geojson.FeatureCollection(features)
+    return feature_collection
+```
+
+For 0942 overpass cases, the generated concaves looks like this:
+
+![0942 Concave Polygons using 25% threshold](../img/0942-25percent-concave-polygons.png)
+
+While for the 1000 overpass, these are the generate concaves:
+
+![1000 Convex Concave using 25% threshold](../img/1000-25percent-concave-polygons.png)
+
+Which improves the issue with our current clustering state, that generates only one cluster (see [above](#current-clustering-state)).
 
 ## Touchdown, recap and further steps
 
@@ -400,6 +521,10 @@ No geopoints yielded, which is logical, since the max Celcius is just above 120�
 #### 2100
 
 ![2100-60-Geopoints](../img/2100-60-geopoints.png)
+
+### Comparison between the 25% dynamic threshold and the 60 W/m²·sr·μm* fixed one
+
+The 25% of the max radiance captured threshold offers a uniform and dynamic approach in classifying hotpixels candidates. It offers a fast and immediate way to compare captured radiances for each pixel with the rest, implicitily comparing the nonfire background. While it provides a fast filtering over data, it can't be considered credible, given the dynamic nature of data its radiance variance. In contrast, a fixed 60 W/m²·sr·μm threshold that suggests a 200°C temperature, and a possible indicator of smaller fires, seems a more reliable approach on identifying potential fires. A possible combination of both thresholds, in a sense that considers the nonfire background and filters out pixels with radiance bellow 200°C, could provide more reliable results.
 
 ### Other fire-detection approaches
 
